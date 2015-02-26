@@ -1,0 +1,17 @@
+#!/usr/bin/env node
+var debug = require('debug')('chatroom');
+var app = require('../app');
+var io = require('socket.io');
+var http = require('http');
+var easyrtc = require('easyrtc');
+
+app.set('port', process.env.PORT || 3000);
+
+var webServer = http.createServer(app).listen(app.get('port'), function() {
+  debug('Express server listening on port ' + webServer.address().port);
+});
+
+var socketServer = io.listen(webServer, {"log level":1});
+
+// Start EasyRTC server
+var rtc = easyrtc.listen(app, socketServer);

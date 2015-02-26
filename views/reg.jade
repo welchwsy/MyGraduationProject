@@ -1,0 +1,38 @@
+extends head
+
+block content
+  script(type='text/javascript').
+    function  function_repassword(){
+      if(document.getElementById('password').value == document.getElementById('repassword').value){
+        console.log('密码一致');    
+      }else{ 
+        alert("密码不一致!请重新输入！");
+        console.log('密码不一致');
+      }  
+    }
+  body
+    - if(message)
+      - if(message.name == 'warning')
+        .alert.alert-warning.alert-dismissible(role='alert')
+          = message.info
+    .container
+      form.form-signin(role='form', method="post")
+        // h2.form-signin-heading 请输入邮箱和密码
+        label 用户名:
+        input.form-control(type='text', id='userName', placeholder='请输入用户名', name='userName', required='', autofocus='')
+        label 邮箱：
+        input.form-control(type='email', id='email', name='email', placeholder='请输入常用的邮箱，作为登录邮箱', required='')
+        label 密码：        
+        input.form-control(type='password', id='password', name='password', placeholder='密码', required='')
+        label 确定密码：
+        input.form-control(type='password', id='repassword', name='repassword', placeholder='再输入一遍密码', required='', onchange='function_repassword()')
+        label.checkbox
+          input(type='checkbox', value='remember-me', checked='true', required='')
+          |  同意使用协议
+        button.btn.btn-lg.btn-primary.btn-block(type='submit') 注册
+    
+    // /container
+    //
+      Bootstrap core JavaScript
+      ==================================================
+    // Placed at the end of the document so the pages load faster

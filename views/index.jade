@@ -1,0 +1,46 @@
+extends layout
+
+block content
+    .container
+      .row
+        div(style="color:#00FF00;height:160px")
+        .col-lg-2.col-lg-offset-3
+          a(href='/')
+            img.img-responsive(src='/images/logo.png')
+        .col-lg-4
+          h1 简会视
+          p 提供简单快捷的会议视频支持
+          form#createRoom.form-inline(role='form', method="post")
+            .input-group 
+              input#room.form-control(name='room' type="text" placeholder="请输入房间号")
+              //span.input-group-btn
+            .input-group 
+              button.btn.btn-default(type='submit') 创建房间
+      div(style="color:#00FF00;height:160px")
+    script(src='/javascripts/socket.io.js')
+    script(src='/javascripts/simplewebrtc.bundle.js')
+    script(src='/javascripts/jquery.min.js')
+    script(type='text/javascript').
+      function islogin(){
+       var login = $('#islogin').val();
+       //console.log(login);
+       if(login == 0||login == null){
+            //alert("没有用户登录");
+         return false;
+        }else{
+            //alert("用户已登录");
+         return true;
+       }      
+      }
+      /**
+      function sub(){
+      console.log('submit is click!');
+      //验证用户登录后使用，用于权限控制
+      if(!islogin()){alert('请先登录!');return;}
+      var val = $('#sessionInput').val().toLowerCase().replace(/\\s/g, '-').replace(/[^A-Za-z0-9_\-]/g, '');
+      console.log('val--->'+ val);
+      var newUrl = location.pathname + 'room/?' + val;
+      window.location.href = newUrl;
+      console.log('newUrl--->'+ newUrl);
+      }*/
+

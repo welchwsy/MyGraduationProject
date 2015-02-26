@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/images/favicon.ico">
+
+    <title>TEST</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/stylesheets/bootstrap.min.css" rel="stylesheet">
+
+  </head>
+
+  <body >
+        <style>
+            .videoContainer {
+                position: relative;
+                width: 200px;
+                height: 150px;
+            }
+            .videoContainer video {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+            }
+            .volume_bar {
+                position: absolute;
+                width: 5px;
+                height: 0px;
+                right: 0px;
+                bottom: 0px;
+                background-color: #12acef;
+            }
+        </style>
+<div class="row">
+    <div class="col-md-12">
+            <button id="screenShareButton"></button>
+        <p id="subTitle"></p>
+        <form id="createRoom">
+            <input id="sessionInput"/>
+            <button type="submit">Create it!</button>
+        </form>     
+    </div>
+    <div class="col-md-8">
+        <!--        
+        <div class="container-fluid" >
+        <video id="mainVdieo" style="height: 400px;" oncontextmenu="return false;" src=""></video>
+        </div>
+        -->
+		<div class="videoContainer col-md-6">
+            <video id="localVideo" style="height: 150px;" oncontextmenu="return false;" ></video>
+            <div id="localVolume" class="volume_bar"></div>
+        </div>
+        <div id="remotes"></div> 
+    </div>
+    <div class="col-md-4">
+        <form class="form-inline col-md-9" role="form">
+				<textarea id="text" class="col-md-12" rows="20">
+				</textarea>
+        </form>  
+        <form class="form-inline col-md-9" role="form">
+				<div class="form-group">
+					<input class="col-md-12" id="inputPassword2" type="password" />
+				</div>
+                <button type="submit" class="btn btn-default ">Sign in</button>
+		</form>
+    </div>
+</div>
+        <script src="/javascripts/jquery.min.js"></script>
+        <script src="/javascripts/socket.io.js"></script>
+        <script src="/javascripts/simplewebrtc.bundle.js"></script>
+        <script>
+            // grab the room from the URL
+            var room = location.search && location.search.split('?')[1];
+    
+            // create our webrtc connection
+            var webrtc = new SimpleWebRTC({
+                // the id/element dom element that will hold "our" video
+                localVideoEl: 'localVideo',
+                // the id/element dom element that will hold remote videos
+                remoteVideosEl: '',
+                // immediately ask for camera access
+                autoRequestMedia: true,
+                debug: false,
+                detectSpeakingEvents: true,
+                autoAdjustMic: false
+            });
+
+            // when it's ready, join if we got a room from the URL
+            webrtc.on('readyToCall', function () {
+                // you can name it anything
+                if (room) webrtc.joinRoom(room);
+            });
+
+            function showVolume(el, volume) {
+                if (!el) return;
+                if (volume < -45) { // vary between -45 and -20
+                    el.style.height = '0px';
+                } else if (volume > -20) {
+                    el.style.height = '100%';
+                } else {
+                    el.style.height = '' + Math.floor((volume + 100) * 100 / 25 - 220) + '%';
+                }
+            }  
+            webrtc.on('channelMessage', function (peer, label, data) {
+                if (data.type == 'volume') {
+                    showVolume(document.getElementById('volume_' + peer.id), data.volume);
+                }
+            });
+            webrtc.on('videoAdded', function (video, peer) {
+                console.log('video added', peer);
+                var remotes = document.getElementById('remotes');
+                if (remotes) {
+                    var d = document.createElement('div');
+                    d.className = 'videoContainer col-md-6';
+                    d.id = 'container_' + webrtc.getDomId(peer);
+                    d.appendChild(video);
+                    console.log('--------------'+typeof(video));
+                    var vol = document.createElement('div');
+                    vol.id = 'volume_' + peer.id;
+                    vol.className = 'volume_bar';
+                    video.onclick = function () {
+                        video.style.width = video.videoWidth + 'px';
+                        video.style.height = video.videoHeight + 'px';
+                    };
+                    d.appendChild(vol);
+                    remotes.appendChild(d);
+                }
+            });
+            webrtc.on('videoRemoved', function (video, peer) {
+                console.log('video removed ', peer);
+                var remotes = document.getElementById('remotes');
+                var el = document.getElementById('container_' + webrtc.getDomId(peer));
+                if (remotes && el) {
+                    remotes.removeChild(el);
+                }
+            });
+            webrtc.on('volumeChange', function (volume, treshold) {
+                //console.log('own volume', volume);
+                showVolume(document.getElementById('localVolume'), volume);
+            });
+
+            // Since we use this twice we put it here
+            function setRoom(name) {
+               // $('form').remove();
+               //$('h1').text(name);
+               //$('#subTitle').text('Link to join: ' + location.href);
+                $('body').addClass('active');
+            }
+
+            if (room) {
+                setRoom(room);
+            } else {
+                $('form').submit(function () {
+                    var val = $('#sessionInput').val().toLowerCase().replace(/\s/g, '-').replace(/[^A-Za-z0-9_\-]/g, '');
+                    webrtc.createRoom(val, function (err, name) {
+                        console.log(' create room cb', arguments);
+                    
+                        var newUrl = location.pathname + '?' + name;
+                        if (!err) {
+                            history.replaceState({foo: 'bar'}, null, newUrl);
+                            setRoom(name);
+                        } else {
+                            console.log(err);
+                        }
+                    });
+                    return false;          
+                });
+            }
+
+            var button = $('#screenShareButton'),
+                setButton = function (bool) {
+                    button.text(bool ? 'share screen' : 'stop sharing');
+                };
+            webrtc.on('localScreenStopped', function () {
+                setButton(true);
+            });
+
+            setButton(true);
+
+            button.click(function () {
+                if (webrtc.getLocalScreen()) {
+                    webrtc.stopScreenShare();
+                    setButton(true);
+                } else {
+                    webrtc.shareScreen(function (err) {
+                        if (err) {
+                            setButton(true);
+                        } else {
+                            setButton(false);
+                        }
+                    });
+                    
+                }
+            }); 
+/**
+  // And put it in the main div on simple click
+  $('#localVideo').click(function(){
+    //handlePreviewClick($(this), 'self');
+    var localVideoSrc = $('#localVideo').attr('src');
+    $('#mainVideo').height='100';
+    console.log(' localVideoclickfunction --'+localVideoSrc);
+    console.log('mainVideo--src:'+$('#mainVideo').src);
+  });
+  // Put a video on the mainVideo div, called when you click on a video preview
+  function handlePreviewClick(el, id){
+    var wait = 1;
+    // There's already a main video, let's hide it
+    // and delay the new one so the fade out as time to complete
+    if ($('#mainVideo video').length > 0){
+      $('#mainVideo').hide(200);
+      wait = 200;
+      // Play all preview
+      // the one in the mainVid was muted
+      $('#webRTCVideo video').each(function(){
+        if ($(this).get(0).volume == 0){
+          $(this).get(0).volume= .7;
+        }
+      });
+    }
+    setTimeout(function(){
+      // To prevent a freeze, change the src before removing the video from the DOM
+      // See https://bugzilla-dev.allizom.org/show_bug.cgi?id=937110
+      if ($.browser.mozilla && $('#mainVideo video').length > 0){
+        $($('#mainVideo video').get(0)).attr('src', $($('#mohPlayer').get(0)).attr('src'));
+        $('#mainVideo video').get(0).pause();
+      }
+      $('#mainVideo').html('');
+      if (el.hasClass('selected')){
+        el.removeClass('selected');
+      }
+      else{
+        // Clone this new preview into the main div
+        $('#mainVideo').html(el.clone().dblclick(function() {
+          //fullScreen(this);
+          })
+          .bind('contextmenu', function(){
+            return false;
+          })
+          .css('max-height', maxHeight())
+          .removeClass('latencyUnknown latencyGood latencyMedium latencyWarn latencyPoor')
+          .attr('id', el.attr('id') + '_main')
+        );
+        $('.selected').removeClass('selected');
+        el.addClass('selected');
+        mainVid = el.attr('id');
+        // Cut the volume the corresponding preview
+        // but only on screen > 768
+        // On smaller screens, the main video is hidden
+        if ($(window).width() > 768){
+          $('#webRTCVideo video').each(function(){
+            if ($(this).get(0).paused){
+              $(this).get(0).play();
+            }
+          });
+          el.get(0).volume = 0;
+          $('#mainVideo video').get(0).volume = 1;
+        }
+        $('#mainVideo').show(200);
+      }
+    }, wait);
+  }
+*/
+        </script> 
+</body>
+</html>

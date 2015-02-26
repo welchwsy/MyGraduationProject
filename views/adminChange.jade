@@ -1,0 +1,66 @@
+doctype html
+html(lang='ch-ZN')
+  head
+    meta(http-equiv='Content-Type', content='text/html; charset=UTF-8')
+    head
+      meta(charset='utf-8')
+      meta(http-equiv='X-UA-Compatible', content='IE=edge')
+      meta(name='viewport', content='width=device-width, initial-scale=1')
+      meta(name='description', content='')
+      meta(name='author', content='')
+      link(rel='icon', href='/images/favicon.ico')
+      title
+        | &#x7BA1;&#x7406;&#x4E2D;&#x5FC3;
+      // Bootstrap core CSS
+      link(href='/stylesheets/bootstrap.min.css', rel='stylesheet')
+      link(href='/stylesheets/navbar-fixed-top.css', rel='stylesheet')
+  body
+    .navbar.navbar-default.navbar-fixed-top(role='navigation')
+      .container
+        .navbar-collapse.collapse
+          ul.nav.navbar-nav
+            li
+              a(href='/admin')
+                | &#x5F85;&#x6FC0;&#x6D3B;&#x7528;&#x6237;
+            li
+              a(href='/admin/allUser')
+                | &#x6240;&#x6709;&#x7528;&#x6237;
+            li.active
+              a(href='/admin/change')
+                | &#x5BC6;&#x7801;&#x4FEE;&#x6539;
+          ul.nav.navbar-nav.navbar-right
+            li
+              a(href='/admin/adminLogout')
+                | &#x5B89;&#x5168;&#x9000;&#x51FA;
+        // /.nav-collapse
+    .container
+      .page-header
+        form(role='form', method='post', action='/admin/adminChange')
+          .form-group
+            label(for='password') &#x539F;&#x5BC6;&#x7801;&#xFF1A;
+            input#password.form-control(type='password', placeholder='password')
+          .form-group
+            label(for='newName') &#x65B0;&#x8D26;&#x6237;&#x540D;&#xFF1A;
+            input#newName.form-control(type='text', placeholder='')
+          .form-group
+            label(for='newPassword') &#x65B0;&#x5BC6;&#x7801;&#xFF1A;
+            input#newPassword.form-control(type='password', placeholder='Password')
+          .form-group
+            label(for='newPassword-repeat') &#x786E;&#x8BA4;&#x5BC6;&#x7801;&#xFF1A;
+            input#newPasswordRepeat.form-control(type='password', placeholder='Password' , onkeyup="repeat()")
+          .form-group
+            p#pInfo(style='display:none') &#x5BC6;&#x7801;&#x4E0D;&#x4E00;&#x81F4;&#xFF0C;&#x8BF7;&#x91CD;&#x8BD5;&#x3002;
+          button#submit.btn.btn-default(type='submit') &#x63D0;&#x4EA4;
+    script(src='/javascripts/jquery.min.js')
+    script.
+      function repeat(){
+      var newPasswordRepeat = $('#newPasswordRepeat').val();
+      var newPassword = $('#newPassword').val();
+      if(newPasswordRepeat != newPassword){
+      $('#submit').attr('disabled',"disabled");
+      $('#pInfo').show();
+      }else{
+      $('#pInfo').hide();
+      $('#submit').removeAttr("disabled");
+      } 
+      }

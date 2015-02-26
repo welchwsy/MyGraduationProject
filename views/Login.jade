@@ -1,0 +1,50 @@
+doctype html
+html(lang='en')
+  head
+    meta(http-equiv='Content-Type', content='text/html; charset=UTF-8')
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    meta(name='description', content='')
+    meta(name='author', content='')
+    link(rel='icon', href='/images/favicon.ico')
+    title &#x767B;&#x5F55;
+    // Bootstrap core CSS
+    link(href='/stylesheets/bootstrap.min.css', rel='stylesheet')
+    // Custom styles for this template
+    link(href='/stylesheets/login.css', rel='stylesheet')
+    // Just for debugging purposes. Don't actually copy these 2 lines!
+    //if lt IE 9
+      script(src='../../assets/js/ie8-responsive-file-warning.js')
+    script(src='/javascripts/ie-emulation-modes-warning.js')
+    // IE10 viewport hack for Surface/desktop Windows 8 bug
+    script(src='/javascripts/ie10-viewport-bug-workaround.js')
+    // HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries
+    //if lt IE 9
+      script(src='https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js')
+      script(src='https://oss.maxcdn.com/respond/1.4.2/respond.min.js')
+  body
+    .container
+      - if(message)
+        - if(message.name == 'warning')
+          .alert.alert-warning.alert-dismissible(role='alert')
+            button.close(type='button', data-dismiss='alert')
+              span(aria-hidden='true') ×
+              span.sr-only Close
+            strong 
+            = message.info
+        - if(message.name == 'success')
+      form.form-signin(role='form', method="post" action='/login')
+        h2.form-signin-heading 请输入邮箱和密码
+        input.form-control(type='email', id='email', name='email', placeholder='Email address', required='', autofocus='')
+        input.form-control(type='password', placeholder='Password', required='', id = 'password', name='password')
+        label.checkbox
+          input(type='checkbox', value='remember-me')
+          |  记住密码
+        button.btn.btn-lg.btn-primary.btn-block(type='submit') 登录
+        a.btn.btn-lg.btn-default.btn-block(role='button',href='/reg') 注册
+    // /container
+    //
+      Bootstrap core JavaScript
+      ==================================================
+    // Placed at the end of the document so the pages load faster

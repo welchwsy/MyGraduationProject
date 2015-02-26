@@ -1,0 +1,25 @@
+doctype html
+html
+  head
+    title  EasyRTC Room
+    meta(http-equiv='Content-Type', content='text/html; charset=utf-8')
+    meta(name='viewport', content='width=device-width, minimum-scale=1, maximum-scale=1')
+    link(rel='stylesheet', type='text/css', href='/easyrtc/easyrtc.css')
+    script(type='text/javascript', src='/easyrtc/easyrtc.js')
+    script(src='/socket.io/socket.io.js')
+    link(rel='stylesheet', type='text/css', href='css/demo_room.css')
+    script(type='text/javascript', src='js/demo_room.js')
+  body(onload='appInit()')
+    #fullpage.boxCommon(style='background-image:url(images/irongrip.png)')
+      video#box0.transit.boxCommon.thumbCommon.easyrtcMirror(muted='muted', volume='0')
+      video#box1.transit.boxCommon.thumbCommon(style='visibility:hidden')
+      video#box2.transit.boxCommon.thumbCommon(style='visibility:hidden')
+      video#box3.transit.boxCommon.thumbCommon(style='visibility:hidden')
+      #textentryBox(onsubmit='sendText()', style='display:none')
+        input#textentryField.transit.boxcommon(type='text')
+        br
+        button#textentrySubmit(style='float:right;margin-right:1em', onclick='sendText()') Send
+        button#textentryCancel(style='float:left;margin-left:1em', onclick='cancelText()') Cancel
+      image#killButton.transit.boxCommon(onclick='killActiveBox()', src='images/button_close.png', style='display:none;z-index:3', alt='close button')
+        image#muteButton.transit.boxCommon(onclick='muteActiveBox()', src='images/button_mute.png', style='display:none;z-index:3', alt='mute button')
+          image#textEntryButton.transit.boxCommon(onclick='showTextEntry()', src='images/textEntry.png', style='z-index:3;display:none', alt='text button')
